@@ -820,18 +820,16 @@ const LiveLeaderboardOverlay = memo(({ leaderboard, myRank, myScore, lastResult,
                         {lastResult.correct ? <IconCorrect /> : <IconIncorrect />}
                     </div>
                     <h3>{lastResult.correct ? 'Correct Answer!' : 'Incorrect'}</h3>
-                    <p>
-                        {lastResult.correct ? (
-                            <>
-                                +{lastResult.basePoints || lastResult.points || 0} points
-                                {lastResult.speedBonus > 0 && (
-                                    <span style={{ color: '#4285F4', marginLeft: '8px' }}>
-                                        +{lastResult.speedBonus} speed bonus! 🚀
-                                    </span>
-                                )}
-                            </>
-                        ) : 'Better luck next time!'}
-                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                        <p style={{ margin: 0 }}>
+                            {lastResult.correct ? `+${lastResult.basePoints || lastResult.points || 0} points` : 'Better luck next time!'}
+                        </p>
+                        {lastResult.correct && lastResult.speedBonus > 0 && (
+                            <p style={{ margin: 0, fontSize: '14px', opacity: 0.9, color: '#4285F4', fontWeight: '600' }}>
+                                +{lastResult.speedBonus} time bonus
+                            </p>
+                        )}
+                    </div>
                 </div>
             )}
             
