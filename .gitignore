@@ -1,0 +1,78 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+**/dist/
+build/
+**/build/
+
+# Cache
+.cache/
+**/.cache/
+.vite/
+**/.vite/
+
+# Logs
+*.log
+logs/
+**/logs/
+
+# SENSITIVE CREDENTIALS AND ENVIRONMENT FILES (NEVER commit these!)
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+**/.env.*.local
+firebase-service-account.json
+*.key
+*.pem
+secrets/
+credentials/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+.temp/
+.tmp/
+
+# IDE specific
+.vscode/extensions.json
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Vercel
+.vercel/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Misc
+dist-ssr/
+*.local
