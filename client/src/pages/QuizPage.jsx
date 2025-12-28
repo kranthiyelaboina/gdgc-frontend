@@ -10,6 +10,7 @@ import PageBackground from '../components/common/PageBackground';
 import LottieIntro from '../components/common/LottieIntro2';
 import Toast from '../components/common/Toast';
 import { QuizLandingGif, AdminLoginImage, Logo } from '../assets';
+import loginModalBg from '../assets/template.png';
 import { validateQuizCode, startQuiz, checkIsQuizAdmin, getSessionStatus } from '../services/quizService';
 import { loginAdmin } from '../services/authService';
 import { useAppContext } from '../context/AppContext';
@@ -272,13 +273,26 @@ const QuizPage = () => {
     const handleSignOut = async () => {
         try {
             await signOut(auth);
+            // Reset all state to initial values
             setFirebaseUser(null);
             setCurrentRollNumber('');
+            setStep('entry');
+            setQuizMode('standard');
+            setActiveQuizCode('');
+            setQuizData(null);
+            setIsLiveMode(false);
+            setLiveQuizState('idle');
+            setLiveSessionCode('');
+            setError('');
             setShowLoginModal(true);
             setToastMessage('Signed out successfully.');
             setToastType('success');
             setShowToast(true);
-        } catch (error) { }
+            // Disconnect socket if connected
+            disconnect();
+        } catch (error) {
+            console.error('Sign out error:', error);
+        }
     };
 
     // Intro and animation effects
@@ -462,7 +476,7 @@ const QuizPage = () => {
                 
                 // Now emit join after connection is confirmed
                 emit('session:join', { sessionCode: normalizedCode, oderId: rollNumber, userName: firebaseUser?.displayName || rollNumber, userPhoto: firebaseUser?.photoURL }, (res) => {
-                    if (res.error) { setError(res.error); setIsJoiningLive(false); }
+                    if (res.error) { setError(res.error); setIsJoiningLive(false); setStep('entry'); }
                     else {
                         setLiveQuizInfo({ title: res.quizTitle, totalQuestions: res.totalQuestions });
                         if (res.participants) setLiveParticipants(res.participants);
@@ -474,6 +488,7 @@ const QuizPage = () => {
             } catch (err) {
                 setError(err.message || 'Could not connect to server. Please try again.');
                 setIsJoiningLive(false);
+                setStep('entry'); // Reset to entry on error
             }
         } else {
             // Standard mode: load quiz
