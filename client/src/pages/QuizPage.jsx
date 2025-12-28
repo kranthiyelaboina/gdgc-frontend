@@ -390,7 +390,15 @@ const QuizPage = () => {
         });
 
         on('question:personal-result', (data) => {
-            setLiveLastResult(data);
+            // Normalize property names from backend (wasCorrect -> correct, pointsEarned -> points)
+            const normalizedResult = {
+                correct: data.wasCorrect ?? data.correct ?? false,
+                points: data.pointsEarned ?? data.points ?? 0,
+                yourAnswer: data.yourAnswer,
+                yourScore: data.yourScore,
+                yourRank: data.yourRank
+            };
+            setLiveLastResult(normalizedResult);
             if (data.yourScore !== undefined) setLiveMyScore(data.yourScore);
             if (data.yourRank !== undefined) setLiveMyRank(data.yourRank);
         });
