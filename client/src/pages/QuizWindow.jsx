@@ -75,7 +75,7 @@ const quizStyles = `
     .enhanced-score-card.error-card h2 { font-size: 24px; font-weight: 700; margin-bottom: 12px; color: #ffffff; }
     .enhanced-score-card.error-card p { font-size: 14px; color: #9aa0a6; line-height: 1.6; }
 
-    .quiz-main-container { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif; position: relative; overflow: hidden; background: url('/src/assets/template.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
+    .quiz-main-container { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Poppins', sans-serif; position: relative; overflow: hidden; background: url('/template.png'); background-size: cover; background-position: center; background-repeat: no-repeat; }
     @keyframes gradientAnimation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     .icon { width: 24px; height: 24px; }
     .icon.large { width: 48px; height: 48px; margin-bottom: 1rem; color: #EA4335; }

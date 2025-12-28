@@ -10,7 +10,6 @@ import PageBackground from '../components/common/PageBackground';
 import LottieIntro from '../components/common/LottieIntro2';
 import Toast from '../components/common/Toast';
 import { QuizLandingGif, AdminLoginImage, Logo } from '../assets';
-import loginModalBg from '../assets/template.png';
 import { validateQuizCode, startQuiz, checkIsQuizAdmin, getSessionStatus } from '../services/quizService';
 import { loginAdmin } from '../services/authService';
 import { useAppContext } from '../context/AppContext';
@@ -735,7 +734,7 @@ const QuizPage = () => {
                 .flipperContainer.isFlipped { transform: rotateY(180deg); }
                 .flipperFront, .flipperBack { backface-visibility: hidden; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
                 .flipperBack { transform: rotateY(180deg); }
-                .panelContainer { width: 100%; height: 100%; background: url('/src/assets/template.png'), rgba(255, 255, 255, 0.85); background-size: cover; background-position: center; backdrop-filter: blur(20px); border-radius: 32px; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12); display: flex; overflow: hidden; position: relative; }
+                .panelContainer { width: 100%; height: 100%; background: url('/template.png'), rgba(255, 255, 255, 0.85); background-size: cover; background-position: center; backdrop-filter: blur(20px); border-radius: 32px; border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12); display: flex; overflow: hidden; position: relative; }
                 .panelContainer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: transparent; border-radius: 32px; z-index: 0; opacity: 0.8; }
                 .panelContainer::after { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; background: linear-gradient(90deg, #4285F4 0%, #34A853 25%, #FBBC04 50%, #EA4335 75%, #4285F4 100%); background-size: 300% 300%; animation: googleBorderFlow 6s linear infinite; border-radius: 34px; z-index: -1; opacity: 0.6; }
                 @keyframes googleGradientFlow { 0% { background-position: 0% 50%; } 25% { background-position: 50% 100%; } 50% { background-position: 100% 50%; } 75% { background-position: 50% 0%; } 100% { background-position: 0% 50%; } }
