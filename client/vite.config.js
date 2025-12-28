@@ -11,4 +11,18 @@ export default defineConfig({
   preview: {
     historyApiFallback: true,
   },
+  build: {
+    // Optimize CSS delivery
+    cssCodeSplit: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom']
+        }
+      }
+    }
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom']
+  }
 })
