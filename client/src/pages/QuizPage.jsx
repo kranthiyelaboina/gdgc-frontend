@@ -390,10 +390,12 @@ const QuizPage = () => {
         });
 
         on('question:personal-result', (data) => {
-            // Normalize property names from backend (wasCorrect -> correct, pointsEarned -> points)
+            // Normalize property names from backend
             const normalizedResult = {
                 correct: data.wasCorrect ?? data.correct ?? false,
                 points: data.pointsEarned ?? data.points ?? 0,
+                basePoints: data.basePoints ?? 0,
+                speedBonus: data.speedBonus ?? 0,
                 yourAnswer: data.yourAnswer,
                 yourScore: data.yourScore,
                 yourRank: data.yourRank
@@ -454,21 +456,23 @@ const QuizPage = () => {
             try {
                 const response = await getSessionStatus(normalizedCode);
                 if (!response.success) throw new Error('Live session not found.');
-                connect({ oderId: rollNumber, userName: firebaseUser?.displayName || rollNumber, userPhoto: firebaseUser?.photoURL });
-                setTimeout(() => {
-                    emit('session:join', { sessionCode: normalizedCode, oderId: rollNumber, userName: firebaseUser?.displayName || rollNumber, userPhoto: firebaseUser?.photoURL }, (res) => {
-                        if (res.error) { setError(res.error); setIsJoiningLive(false); }
-                        else {
-                            setLiveQuizInfo({ title: res.quizTitle, totalQuestions: res.totalQuestions });
-                            if (res.participants) setLiveParticipants(res.participants);
-                            setLiveQuizState('lobby');
-                            setStep('quiz'); // CRITICAL: Set step to 'quiz' so QuizWindow renders
-                            setIsJoiningLive(false);
-                        }
-                    });
-                }, 200);
+                
+                // Wait for socket connection to be established
+                await connect({ oderId: rollNumber, userName: firebaseUser?.displayName || rollNumber, userPhoto: firebaseUser?.photoURL });
+                
+                // Now emit join after connection is confirmed
+                emit('session:join', { sessionCode: normalizedCode, oderId: rollNumber, userName: firebaseUser?.displayName || rollNumber, userPhoto: firebaseUser?.photoURL }, (res) => {
+                    if (res.error) { setError(res.error); setIsJoiningLive(false); }
+                    else {
+                        setLiveQuizInfo({ title: res.quizTitle, totalQuestions: res.totalQuestions });
+                        if (res.participants) setLiveParticipants(res.participants);
+                        setLiveQuizState('lobby');
+                        setStep('quiz'); // CRITICAL: Set step to 'quiz' so QuizWindow renders
+                        setIsJoiningLive(false);
+                    }
+                });
             } catch (err) {
-                setError(err.message || 'Live session not found.');
+                setError(err.message || 'Could not connect to server. Please try again.');
                 setIsJoiningLive(false);
             }
         } else {

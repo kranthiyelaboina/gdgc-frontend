@@ -28,37 +28,48 @@ export const useQuizSocket = () => {
     }, []);
 
     const connect = useCallback((authData = {}) => {
-        if (quizSocket?.connected) {
-            setIsConnected(true);
-            return;
-        }
+        return new Promise((resolve, reject) => {
+            if (quizSocket?.connected) {
+                setIsConnected(true);
+                resolve(true);
+                return;
+            }
 
-        quizSocket = io(`${SOCKET_URL}/quiz`, {
-            auth: authData,
-            transports: ['websocket', 'polling'],
-            reconnection: true,
-            reconnectionAttempts: 5,
-            reconnectionDelay: 1000,
+            quizSocket = io(`${SOCKET_URL}/quiz`, {
+                auth: authData,
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+                timeout: 10000,
+            });
+
+            const connectTimeout = setTimeout(() => {
+                reject(new Error('Connection timeout'));
+            }, 10000);
+
+            quizSocket.on('connect', () => {
+                clearTimeout(connectTimeout);
+                notifyConnectionChange(true);
+                setConnectionError(null);
+                resolve(true);
+            });
+
+            quizSocket.on('disconnect', (reason) => {
+                notifyConnectionChange(false);
+            });
+
+            quizSocket.on('connect_error', (error) => {
+                clearTimeout(connectTimeout);
+                setConnectionError(error.message);
+                notifyConnectionChange(false);
+                reject(error);
+            });
+
+            Object.entries(eventHandlersRef.current).forEach(([event, handler]) => {
+                quizSocket.on(event, handler);
+            });
         });
-
-        quizSocket.on('connect', () => {
-            notifyConnectionChange(true);
-            setConnectionError(null);
-        });
-
-        quizSocket.on('disconnect', (reason) => {
-            notifyConnectionChange(false);
-        });
-
-        quizSocket.on('connect_error', (error) => {
-            setConnectionError(error.message);
-            notifyConnectionChange(false);
-        });
-
-        Object.entries(eventHandlersRef.current).forEach(([event, handler]) => {
-            quizSocket.on(event, handler);
-        });
-
     }, []);
 
     const disconnect = useCallback(() => {
