@@ -411,7 +411,7 @@ const AdminDashboardPage = () => {
   }, [activeTab]);
 
   useEffect(() => {
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://gdgcplatformbackend.onrender.com/api';
     const SOCKET_URL = API_BASE_URL.replace('/api', '');
     
     // Connect to Socket.io server

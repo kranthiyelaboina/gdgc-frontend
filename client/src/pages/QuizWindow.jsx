@@ -7,7 +7,7 @@ import Footer from '../components/layout/Footer';
 import PageBackground from '../components/common/PageBackground';
 
 // API Base URL from environment
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://gdgcplatformbackend.onrender.com/api';
 
 // ============================================
 // CSS STYLES (Original + Live mode additions)
@@ -253,17 +253,152 @@ const quizStyles = `
     .guidelines-progress .progress-bar-fill { background: linear-gradient(90deg, #4285F4, #34A853); height: 6px; }
 
     @media (max-width: 900px) {
-        .professional-certificate { aspect-ratio: auto; max-width: 100%; }
+        .professional-certificate { width: 95%; max-width: 650px; height: auto; aspect-ratio: 650/450; transform: scale(0.95); }
         .scorecard-actions { flex-direction: column; }
         .action-button { width: 100%; }
+        .results-row { flex-direction: column; gap: 16px; }
+        .result-banner, .my-score-card { max-width: 100%; width: 100%; min-width: unset; }
     }
     
     @media (max-width: 768px) { 
         .options-grid { grid-template-columns: 1fr !important; } 
         .quiz-interface footer { flex-direction: column-reverse; gap: 12px; } 
         .nav-button { width: 100%; }
-        .quiz-logo { height: clamp(70px, 12vw, 100px); left: 0; top: 0; }
-        .quiz-interface header h1 { margin-left: clamp(85px, 18vw, 120px); font-size: clamp(0.9rem, 2.2vw, 1.2rem); }
+        .quiz-logo { height: clamp(50px, 10vw, 70px); left: 4px; top: 4px; }
+        .quiz-interface header h1 { margin-left: clamp(60px, 14vw, 90px); font-size: clamp(0.8rem, 2vw, 1rem); }
+        .quiz-interface { padding: 12px 8px; gap: 8px; }
+        .question-card { padding: 16px; padding-top: 40px; border-radius: 16px; }
+        .question-text { font-size: clamp(0.95rem, 2.5vw, 1.2rem); }
+        .option-card { padding: 14px; border-radius: 12px; }
+        .option-prefix { width: 30px; height: 30px; margin-right: 12px; font-size: 0.9rem; }
+        .option-text { font-size: 0.95rem; }
+        .timer-container { padding: 8px 14px; font-size: 1rem; }
+        
+        /* Leaderboard Overlay Mobile */
+        .leaderboard-overlay { padding: 16px; padding-top: 24px; }
+        .result-banner { padding: 16px 20px; border-radius: 16px; }
+        .result-banner h3 { font-size: 20px; }
+        .result-banner p { font-size: 14px; }
+        .result-emoji { font-size: 40px; }
+        .my-score-card { padding: 16px 20px; border-radius: 16px; }
+        .score-value { font-size: 40px; }
+        .score-label { font-size: 11px; }
+        .rank-badge { padding: 8px 14px; font-size: 13px; }
+        .leaderboard-header h2 { font-size: 22px; }
+        .leaderboard-header p { font-size: 13px; }
+        .leaderboard-list { max-height: 250px; }
+        .leaderboard-item { padding: 10px 14px; gap: 10px; border-radius: 12px; }
+        .rank-circle { width: 32px; height: 32px; font-size: 13px; }
+        .player-photo { width: 32px; height: 32px; }
+        .player-name { font-size: 13px; }
+        .player-score { font-size: 16px; }
+        
+        /* Certificate Mobile */
+        .professional-certificate { 
+            width: 100%; 
+            height: auto; 
+            min-height: 280px;
+            aspect-ratio: auto;
+            transform: scale(1);
+            border-radius: 12px;
+        }
+        .cert-left-bar { width: 50px; }
+        .cert-main-content { left: 55px; padding: 10px; }
+        .cert-header-row { margin-bottom: 6px; min-height: 50px; }
+        .cert-title { font-size: clamp(18px, 5vw, 28px); letter-spacing: 2px; }
+        .cert-subtitle { font-size: clamp(8px, 2.5vw, 12px); letter-spacing: 2px; margin-top: 4px; }
+        .cert-award-badge { display: none; }
+        .cert-present-text { font-size: 10px; margin-bottom: 6px; }
+        .cert-user-photo, .cert-user-avatar { width: 36px; height: 36px; font-size: 16px; line-height: 30px; }
+        .cert-user-photo-wrapper { margin-right: 8px; }
+        .cert-user-name { font-size: 14px; }
+        .cert-user-rollno { font-size: 9px; }
+        .cert-achievement-text { font-size: 10px; margin-bottom: 3px; }
+        .cert-score-text { font-size: 10px; }
+        .cert-signature-row { bottom: 30px; left: 55px; padding-top: 4px; }
+        .signature-line { font-size: 10px; min-width: 80px; }
+        .signature-name { font-size: 7px; margin-top: 2px; }
+        .signature-title { font-size: 6px; }
+        .cert-footer-row { bottom: 4px; left: 55px; padding-top: 4px; }
+        .verified-logo { width: 16px; height: 16px; margin-right: 4px; }
+        .verified-text-clean { font-size: 10px; }
+        .cert-date-display { font-size: 9px; }
+        .cert-logo-container { width: 48px; padding: 6px 6px 4px 6px; }
+        .cert-logo { width: 38px; height: 38px; }
+        .cert-org-text .org-name { font-size: 8px; }
+        .cert-org-text .org-sub { font-size: 7px; }
+        
+        /* Scorecard wrapper mobile */
+        .scorecard-wrapper { padding: 12px; gap: 16px; }
+        .scorecard-main-content { padding: 80px 12px 60px; }
+        .action-button { padding: 12px 20px; font-size: 13px; }
+        
+        /* Welcome container mobile */
+        .welcome-container { padding: 1.5rem; min-height: 380px; }
+        .welcome-title { font-size: clamp(1.5rem, 4vw, 2rem); }
+        .welcome-p { font-size: 0.9rem; margin: 0.8rem auto 1.2rem; }
+        .welcome-button { padding: 12px 22px; font-size: 0.95rem; }
+        .guidelines-list { gap: 0.75rem; }
+        .guideline-item { padding: 0.6rem 0.9rem; font-size: 0.85rem; border-radius: 10px; }
+        
+        /* Live answered indicator mobile */
+        .live-answered-indicator { padding: 12px 16px; font-size: 14px; border-radius: 10px; }
+    }
+    
+    @media (max-width: 480px) {
+        .quiz-logo { height: 45px; }
+        .quiz-interface header h1 { margin-left: 55px; font-size: 0.75rem; }
+        .question-card { padding: 12px; padding-top: 35px; }
+        .question-type-tag { padding: 4px 10px; font-size: 0.7rem; }
+        .question-text { font-size: 0.9rem; line-height: 1.5; }
+        .option-card { padding: 12px; }
+        .option-prefix { width: 26px; height: 26px; margin-right: 10px; font-size: 0.8rem; border-radius: 6px; }
+        .option-text { font-size: 0.85rem; }
+        .timer-container { padding: 6px 10px; font-size: 0.9rem; gap: 6px; }
+        .progress-bar-container { height: 6px; }
+        .progress-bar-fill { height: 6px; }
+        .question-counter { font-size: 0.85rem; }
+        .nav-button { padding: 12px 20px; font-size: 0.9rem; border-radius: 10px; }
+        
+        /* Leaderboard very small screens */
+        .leaderboard-header h2 { font-size: 18px; }
+        .result-banner h3 { font-size: 16px; }
+        .score-value { font-size: 32px; }
+        .leaderboard-list { max-height: 200px; }
+        .leaderboard-item { padding: 8px 10px; }
+        .rank-circle { width: 28px; height: 28px; font-size: 11px; }
+        .player-photo { width: 28px; height: 28px; }
+        .player-name { font-size: 11px; }
+        .player-score { font-size: 14px; }
+        
+        /* Certificate very small screens */
+        .cert-left-bar { width: 40px; }
+        .cert-main-content { left: 45px; padding: 8px; }
+        .cert-title { font-size: 16px; letter-spacing: 1px; }
+        .cert-subtitle { font-size: 7px; letter-spacing: 1px; }
+        .cert-user-photo, .cert-user-avatar { width: 30px; height: 30px; font-size: 14px; line-height: 24px; border-width: 2px; }
+        .cert-user-name { font-size: 12px; }
+        .cert-user-rollno { font-size: 8px; }
+        .cert-achievement-text, .cert-score-text { font-size: 8px; }
+        .cert-signature-row { bottom: 24px; left: 45px; }
+        .signature-line { font-size: 8px; min-width: 60px; border-bottom-width: 1px; }
+        .signature-name { font-size: 6px; }
+        .signature-title { font-size: 5px; }
+        .cert-footer-row { left: 45px; }
+        .verified-logo { width: 14px; height: 14px; }
+        .verified-text-clean { font-size: 9px; }
+        .cert-date-display { font-size: 8px; }
+        .cert-logo-container { width: 36px; padding: 4px 4px 3px 4px; border-radius: 6px; }
+        .cert-logo { width: 28px; height: 28px; }
+        .cert-org-text .org-name { font-size: 6px; }
+        .cert-org-text .org-sub { font-size: 5px; }
+        
+        /* Modal mobile */
+        .modal-content { padding: 20px; border-radius: 16px; }
+        .modal-content h2 { font-size: 1.25rem; }
+        .modal-content p { font-size: 0.95rem; }
+        .modal-actions { flex-direction: column; }
+        .modal-button { max-width: none; padding: 10px 20px; }
     }
 `;
 
@@ -355,12 +490,48 @@ const lobbyStyles = `
     .guidelines-confirm-btn .icon { width: 20px; height: 20px; }
     
     @media (max-width: 768px) {
-        .lobby-content-card { padding: 32px 24px; margin: 16px; }
-        .lobby-title { font-size: 24px; }
-        .session-code { font-size: 26px; }
-        .lobby-stats-row { gap: 16px; }
-        .lobby-actions { flex-direction: column; }
-        .guidelines-modal-content { margin: 16px; }
+        .lobby-content-card { padding: 24px 20px; margin: 12px; border-radius: 24px; }
+        .lobby-title { font-size: 22px; }
+        .lobby-subtitle { font-size: 13px; margin-bottom: 24px; }
+        .session-code { font-size: 22px; letter-spacing: 3px; }
+        .session-label { font-size: 10px; }
+        .session-icon { width: 44px; height: 44px; border-radius: 12px; }
+        .lobby-stats-row { flex-direction: column; gap: 12px; padding: 12px 0; }
+        .lobby-stat-divider { display: none; }
+        .lobby-stat-item { width: 100%; justify-content: center; }
+        .stat-icon { width: 36px; height: 36px; border-radius: 10px; }
+        .stat-value { font-size: 18px; }
+        .stat-label { font-size: 11px; }
+        .lobby-actions { flex-direction: column; gap: 10px; }
+        .lobby-guidelines-btn, .lobby-leave-btn { padding: 12px 20px; font-size: 13px; border-radius: 12px; }
+        .lobby-waiting-container { flex-direction: column; gap: 12px; }
+        .lobby-footer-tip { padding: 10px 12px; }
+        .lobby-footer-tip span { font-size: 11px; }
+        .guidelines-modal-content { margin: 12px; max-height: 90vh; border-radius: 20px; }
+        .guidelines-modal-header { padding: 18px 20px; }
+        .guidelines-modal-header h2 { font-size: 18px; }
+        .guidelines-modal-body { padding: 20px; max-height: 45vh; }
+        .guidelines-list.modal-guidelines { gap: 12px; }
+        .guidelines-list.modal-guidelines .guideline-item { padding: 12px; border-radius: 12px; }
+        .guideline-icon { width: 36px; height: 36px; border-radius: 10px; }
+        .guideline-content strong { font-size: 13px; }
+        .guideline-content p { font-size: 11px; }
+        .guidelines-modal-footer { padding: 16px 20px; }
+        .guidelines-confirm-btn { padding: 14px 20px; font-size: 14px; border-radius: 12px; }
+        .lobby-live-badge { padding: 8px 18px; font-size: 11px; }
+    }
+    
+    @media (max-width: 480px) {
+        .lobby-content-card { padding: 20px 16px; margin: 8px; border-radius: 20px; }
+        .lobby-title { font-size: 18px; }
+        .lobby-subtitle { font-size: 12px; }
+        .session-code { font-size: 18px; letter-spacing: 2px; }
+        .lobby-session-card { padding: 14px 16px; gap: 12px; border-radius: 14px; }
+        .stat-icon { width: 32px; height: 32px; }
+        .lobby-live-badge { padding: 6px 14px; font-size: 10px; margin-bottom: 16px; }
+        .guidelines-modal-content { margin: 8px; }
+        .guidelines-modal-header { padding: 14px 16px; }
+        .guidelines-modal-body { padding: 16px; }
     }
 `;
 
@@ -809,29 +980,34 @@ const IconRank = ({ rank }) => {
     );
 };
 
-const LiveLeaderboardOverlay = memo(({ leaderboard, myRank, myScore, lastResult, questionIndex, totalQuestions }) => (
+const LiveLeaderboardOverlay = memo(({ leaderboard, myRank, myScore, lastResult, questionIndex, totalQuestions }) => {
+    // Always show result - treat null/undefined as incorrect (no answer submitted)
+    const isCorrect = lastResult?.correct || false;
+    const basePoints = lastResult?.basePoints || lastResult?.points || 0;
+    const speedBonus = lastResult?.speedBonus || 0;
+    const didAnswer = lastResult?.didAnswer ?? (lastResult !== null && lastResult !== undefined);
+    
+    return (
     <div className="leaderboard-overlay">
         {/* Results Row - Side by Side */}
         <div className="results-row">
-            {/* Result Banner */}
-            {lastResult && (
-                <div className={`result-banner ${lastResult.correct ? 'correct' : 'incorrect'}`}>
-                    <div style={{ marginBottom: '12px' }}>
-                        {lastResult.correct ? <IconCorrect /> : <IconIncorrect />}
-                    </div>
-                    <h3>{lastResult.correct ? 'Correct Answer!' : 'Incorrect'}</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                        <p style={{ margin: 0 }}>
-                            {lastResult.correct ? `+${lastResult.basePoints || lastResult.points || 0} points` : 'Better luck next time!'}
-                        </p>
-                        {lastResult.correct && lastResult.speedBonus > 0 && (
-                            <p style={{ margin: 0, fontSize: '14px', opacity: 0.9, color: '#4285F4', fontWeight: '600' }}>
-                                +{lastResult.speedBonus} time bonus
-                            </p>
-                        )}
-                    </div>
+            {/* Result Banner - ALWAYS SHOWN */}
+            <div className={`result-banner ${isCorrect ? 'correct' : 'incorrect'}`}>
+                <div style={{ marginBottom: '12px' }}>
+                    {isCorrect ? <IconCorrect /> : <IconIncorrect />}
                 </div>
-            )}
+                <h3>{isCorrect ? 'Correct Answer!' : (didAnswer ? 'Incorrect' : 'Time\'s Up!')}</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                    <p style={{ margin: 0 }}>
+                        {isCorrect ? `+${basePoints} points` : (didAnswer ? 'Better luck next time!' : 'No answer submitted')}
+                    </p>
+                    {isCorrect && speedBonus > 0 && (
+                        <p style={{ margin: 0, fontSize: '14px', opacity: 0.9, color: '#4285F4', fontWeight: '600' }}>
+                            +{speedBonus} time bonus
+                        </p>
+                    )}
+                </div>
+            </div>
             
             {/* Your Score Card */}
             <div className="my-score-card">
@@ -886,7 +1062,8 @@ const LiveLeaderboardOverlay = memo(({ leaderboard, myRank, myScore, lastResult,
             </div>
         </div>
     </div>
-));
+    );
+});
 
 const QuizContent = memo(({ onFinalSubmit }) => {
     const { state, dispatch, quizData, liveMode } = useQuiz();
@@ -1151,12 +1328,13 @@ const QuizInterface = () => {
     }, [liveMode?.quizState, liveMode?.questionIndex, liveMode?.currentQuestion, dispatch, phase, requestFullScreen]);
 
     // Live mode: show leaderboard between questions
+    // Re-dispatch when lastResult updates (it may arrive after showLeaderboard flag)
     useEffect(() => {
         if (!liveMode) return;
         if (liveMode.showLeaderboard) {
             dispatch({ type: 'LIVE_SHOW_LEADERBOARD', leaderboard: liveMode.leaderboard, lastResult: liveMode.lastResult, myScore: liveMode.myScore, myRank: liveMode.myRank });
         }
-    }, [liveMode?.showLeaderboard, liveMode?.leaderboard, dispatch]);
+    }, [liveMode?.showLeaderboard, liveMode?.leaderboard, liveMode?.lastResult, liveMode?.myScore, liveMode?.myRank, dispatch]);
 
     // Live mode: quiz complete
     useEffect(() => {

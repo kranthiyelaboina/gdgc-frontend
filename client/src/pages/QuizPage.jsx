@@ -412,7 +412,8 @@ const QuizPage = () => {
                 speedBonus: data.speedBonus ?? 0,
                 yourAnswer: data.yourAnswer,
                 yourScore: data.yourScore,
-                yourRank: data.yourRank
+                yourRank: data.yourRank,
+                didAnswer: data.didAnswer ?? (data.yourAnswer !== null && data.yourAnswer !== undefined)
             };
             setLiveLastResult(normalizedResult);
             if (data.yourScore !== undefined) setLiveMyScore(data.yourScore);

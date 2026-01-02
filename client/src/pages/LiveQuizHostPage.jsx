@@ -241,6 +241,15 @@ const GlobalStyles = () => (
             .host-main-grid { padding: 8px !important; }
             .host-btn { padding: 12px 20px !important; font-size: 12px !important; }
         }
+        
+        /* Final Leaderboard Mobile Styles */
+        @media (max-width: 768px) {
+            .final-leaderboard-podium { 
+                flex-direction: column !important; 
+                align-items: center !important;
+                gap: 16px !important;
+            }
+        }
     `}</style>
 );
 
@@ -561,7 +570,593 @@ const ConnectionStatus = ({ connected }) => (
     </div>
 );
 
-// --- 4.7 3D Podium Avatar ---
+// --- 4.7 Premium Final Leaderboard Components ---
+
+// Confetti Effect Component
+const Confetti = () => {
+    const colors = ['#4285F4', '#EA4335', '#FBBC04', '#34A853', '#FFD700', '#FF6B6B', '#9B59B6'];
+    const confettiPieces = Array.from({ length: 60 }, (_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        delay: Math.random() * 3,
+        duration: 3 + Math.random() * 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: 8 + Math.random() * 8,
+        rotation: Math.random() * 360
+    }));
+    
+    return (
+        <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 100 }}>
+            {confettiPieces.map(piece => (
+                <div key={piece.id} style={{
+                    position: 'absolute',
+                    left: `${piece.left}%`,
+                    top: '-20px',
+                    width: piece.size,
+                    height: piece.size * 0.6,
+                    backgroundColor: piece.color,
+                    transform: `rotate(${piece.rotation}deg)`,
+                    animation: `confetti-fall ${piece.duration}s ease-in-out ${piece.delay}s infinite`,
+                    opacity: 0.9,
+                    borderRadius: '2px'
+                }} />
+            ))}
+            <style>{`
+                @keyframes confetti-fall {
+                    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+                    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+                }
+            `}</style>
+        </div>
+    );
+};
+
+// Podium Card for Top 3
+const PodiumCard = ({ rank, user, score, delay, totalParticipants }) => {
+    const isFirst = rank === 1;
+    const isSecond = rank === 2;
+    const isThird = rank === 3;
+    
+    // Heights for the podium pedestals - more dramatic difference
+    const pedestalHeight = isFirst ? 200 : isSecond ? 150 : 110;
+    // Much wider card sizes to fill the page
+    const cardWidth = isFirst ? 280 : 240;
+    const avatarSize = isFirst ? 120 : 100;
+    
+    // Medal colors and gradients
+    const medalConfig = {
+        1: { 
+            gradient: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%)',
+            glow: 'rgba(255, 215, 0, 0.6)',
+            bgGradient: 'linear-gradient(180deg, rgba(255,215,0,0.25) 0%, rgba(255,165,0,0.08) 100%)',
+            label: '1st',
+            icon: '👑'
+        },
+        2: { 
+            gradient: 'linear-gradient(135deg, #E8E8E8 0%, #B8B8B8 50%, #D8D8D8 100%)',
+            glow: 'rgba(192, 192, 192, 0.5)',
+            bgGradient: 'linear-gradient(180deg, rgba(192,192,192,0.18) 0%, rgba(128,128,128,0.05) 100%)',
+            label: '2nd',
+            icon: '🥈'
+        },
+        3: { 
+            gradient: 'linear-gradient(135deg, #CD7F32 0%, #8B4513 50%, #CD7F32 100%)',
+            glow: 'rgba(205, 127, 50, 0.5)',
+            bgGradient: 'linear-gradient(180deg, rgba(205,127,50,0.18) 0%, rgba(139,69,19,0.05) 100%)',
+            label: '3rd',
+            icon: '🥉'
+        }
+    };
+    
+    const config = medalConfig[rank];
+    
+    return (
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            animation: `podium-rise 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+            animationDelay: `${delay}s`,
+            opacity: 0,
+            transform: 'translateY(100px) scale(0.8)'
+        }}>
+            <style>{`
+                @keyframes podium-rise {
+                    0% { opacity: 0; transform: translateY(100px) scale(0.8); }
+                    60% { transform: translateY(-20px) scale(1.05); }
+                    100% { opacity: 1; transform: translateY(0) scale(1); }
+                }
+                @keyframes crown-float {
+                    0%, 100% { transform: translateY(0) rotate(-5deg); }
+                    50% { transform: translateY(-8px) rotate(5deg); }
+                }
+                @keyframes glow-pulse {
+                    0%, 100% { box-shadow: 0 0 30px ${config.glow}, 0 0 60px ${config.glow}40; }
+                    50% { box-shadow: 0 0 50px ${config.glow}, 0 0 100px ${config.glow}60; }
+                }
+                @keyframes score-count {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.2); }
+                    100% { transform: scale(1); }
+                }
+            `}</style>
+            
+            {/* Crown/Icon for winner */}
+            {isFirst && (
+                <div style={{
+                    fontSize: '56px',
+                    marginBottom: '12px',
+                    animation: 'crown-float 2s ease-in-out infinite',
+                    filter: 'drop-shadow(0 4px 20px rgba(255,215,0,0.6))'
+                }}>👑</div>
+            )}
+            
+            {/* Profile Card - Wider */}
+            <div style={{
+                width: cardWidth,
+                background: 'rgba(20, 20, 30, 0.95)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '28px',
+                padding: '24px 20px',
+                border: `3px solid ${config.glow}`,
+                boxShadow: `0 20px 60px rgba(0,0,0,0.5), 0 0 50px ${config.glow}40`,
+                animation: isFirst ? 'glow-pulse 3s ease-in-out infinite' : 'none',
+                position: 'relative',
+                zIndex: 2
+            }}>
+                {/* Avatar with medal border */}
+                <div style={{
+                    width: avatarSize,
+                    height: avatarSize,
+                    margin: '0 auto 16px',
+                    borderRadius: '50%',
+                    padding: '4px',
+                    background: config.gradient,
+                    boxShadow: `0 0 40px ${config.glow}`
+                }}>
+                    {user.userPhoto ? (
+                        <img src={user.userPhoto} alt="" style={{
+                            width: '100%', height: '100%',
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            border: '4px solid #1a1a2e'
+                        }} />
+                    ) : (
+                        <div style={{
+                            width: '100%', height: '100%',
+                            borderRadius: '50%',
+                            background: 'linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 'bold',
+                            fontSize: isFirst ? '36px' : '28px',
+                            color: 'white',
+                            border: '4px solid #1a1a2e'
+                        }}>
+                            {user.userName?.charAt(0)?.toUpperCase() || '?'}
+                        </div>
+                    )}
+                </div>
+                
+                {/* Rank Badge */}
+                <div style={{
+                    position: 'absolute',
+                    top: -12,
+                    right: -12,
+                    width: 42,
+                    height: 42,
+                    borderRadius: '50%',
+                    background: config.gradient,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 800,
+                    fontSize: '18px',
+                    color: '#1a1a2e',
+                    boxShadow: `0 4px 20px ${config.glow}`,
+                    border: '3px solid rgba(255,255,255,0.3)'
+                }}>
+                    {rank}
+                </div>
+                
+                {/* Name */}
+                <div style={{
+                    textAlign: 'center',
+                    fontWeight: 700,
+                    fontSize: isFirst ? '18px' : '16px',
+                    color: 'white',
+                    marginBottom: '10px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '100%'
+                }}>
+                    {user.userName || 'Anonymous'}
+                </div>
+                
+                {/* Score */}
+                <div style={{
+                    textAlign: 'center',
+                    fontFamily: 'Space Grotesk, monospace',
+                    fontSize: isFirst ? '32px' : '26px',
+                    fontWeight: 800,
+                    background: config.gradient,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                }}>
+                    {score?.toLocaleString() || 0}
+                </div>
+                <div style={{
+                    textAlign: 'center',
+                    fontSize: '11px',
+                    color: 'rgba(255,255,255,0.6)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '3px',
+                    marginTop: '2px'
+                }}>
+                    points
+                </div>
+            </div>
+            
+            {/* Pedestal - Wider and with visible rank */}
+            <div style={{
+                width: cardWidth + 20,
+                height: pedestalHeight,
+                background: config.bgGradient,
+                borderTop: `4px solid ${config.glow}`,
+                borderLeft: '1px solid rgba(255,255,255,0.1)',
+                borderRight: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '0 0 24px 24px',
+                position: 'relative',
+                overflow: 'hidden',
+                backdropFilter: 'blur(10px)'
+            }}>
+                {/* Shimmer effect */}
+                <div style={{
+                    position: 'absolute',
+                    top: 0, left: 0,
+                    width: '200%', height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent)',
+                    animation: 'shimmer 3s infinite linear'
+                }} />
+                
+                {/* Rank label on pedestal - MORE VISIBLE */}
+                <div style={{
+                    position: 'absolute',
+                    bottom: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, 50%)',
+                    fontSize: isFirst ? '72px' : '56px',
+                    fontWeight: 900,
+                    color: 'rgba(255,255,255,0.25)',
+                    fontFamily: 'Space Grotesk, monospace',
+                    textShadow: `0 0 30px ${config.glow}30`
+                }}>
+                    {rank}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Table Row Component with animation
+const LeaderboardTableRow = ({ rank, user, score, delay, isEven }) => (
+    <tr style={{
+        animation: `row-slide-in 0.5s ease-out forwards`,
+        animationDelay: `${delay}s`,
+        opacity: 0,
+        transform: 'translateX(-20px)',
+        background: isEven ? 'rgba(255,255,255,0.02)' : 'transparent'
+    }}>
+        <style>{`
+            @keyframes row-slide-in {
+                0% { opacity: 0; transform: translateX(-20px); }
+                100% { opacity: 1; transform: translateX(0); }
+            }
+        `}</style>
+        <td style={{
+            padding: '16px 20px',
+            fontWeight: 700,
+            fontFamily: 'Space Grotesk, monospace',
+            fontSize: '16px',
+            color: 'rgba(255,255,255,0.7)',
+            borderBottom: '1px solid rgba(255,255,255,0.05)'
+        }}>
+            #{rank}
+        </td>
+        <td style={{
+            padding: '16px 20px',
+            borderBottom: '1px solid rgba(255,255,255,0.05)'
+        }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                {user.userPhoto ? (
+                    <img src={user.userPhoto} alt="" style={{
+                        width: 40, height: 40,
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                        border: '2px solid rgba(255,255,255,0.1)'
+                    }} />
+                ) : (
+                    <div style={{
+                        width: 40, height: 40,
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #4285F4 0%, #34A853 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 600,
+                        fontSize: '16px',
+                        color: 'white'
+                    }}>
+                        {user.userName?.charAt(0)?.toUpperCase() || '?'}
+                    </div>
+                )}
+                <span style={{ fontWeight: 600, color: 'white' }}>
+                    {user.userName || 'Anonymous'}
+                </span>
+            </div>
+        </td>
+        <td style={{
+            padding: '16px 20px',
+            textAlign: 'center',
+            fontFamily: 'Space Grotesk, monospace',
+            fontSize: '14px',
+            color: 'rgba(255,255,255,0.6)',
+            borderBottom: '1px solid rgba(255,255,255,0.05)'
+        }}>
+            {user.correctAnswers || 0}/{user.totalAnswers || 0}
+        </td>
+        <td style={{
+            padding: '16px 20px',
+            textAlign: 'right',
+            borderBottom: '1px solid rgba(255,255,255,0.05)'
+        }}>
+            <span style={{
+                fontFamily: 'Space Grotesk, monospace',
+                fontSize: '18px',
+                fontWeight: 700,
+                background: 'linear-gradient(135deg, #4285F4 0%, #34A853 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+            }}>
+                {score?.toLocaleString() || 0}
+            </span>
+        </td>
+    </tr>
+);
+
+// Full Final Leaderboard Screen
+const FinalLeaderboardScreen = ({ leaderboard, onReturn, quizTitle }) => {
+    const top3 = leaderboard.slice(0, 3);
+    const rest = leaderboard.slice(3);
+    const totalParticipants = leaderboard.length;
+    
+    return (
+        <div style={{
+            minHeight: '100vh',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '40px 20px',
+            position: 'relative',
+            overflow: 'auto'
+        }}>
+            {/* Confetti */}
+            <Confetti />
+            
+            {/* Header */}
+            <div style={{
+                textAlign: 'center',
+                marginBottom: '60px',
+                animation: 'fade-in 1s ease-out forwards',
+                zIndex: 10
+            }}>
+                <style>{`
+                    @keyframes fade-in {
+                        0% { opacity: 0; transform: translateY(-20px); }
+                        100% { opacity: 1; transform: translateY(0); }
+                    }
+                    @keyframes title-glow {
+                        0%, 100% { text-shadow: 0 0 20px rgba(255,215,0,0.3), 0 0 40px rgba(255,215,0,0.1); }
+                        50% { text-shadow: 0 0 40px rgba(255,215,0,0.5), 0 0 80px rgba(255,215,0,0.2); }
+                    }
+                `}</style>
+                <div style={{
+                    fontSize: '14px',
+                    letterSpacing: '6px',
+                    color: THEME.colors.brand.yellow,
+                    textTransform: 'uppercase',
+                    marginBottom: '16px',
+                    fontWeight: 600
+                }}>
+                    🏆 Session Complete 🏆
+                </div>
+                <h1 style={{
+                    fontSize: 'clamp(36px, 8vw, 72px)',
+                    fontWeight: 900,
+                    background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF6B6B 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    margin: 0,
+                    animation: 'title-glow 3s ease-in-out infinite',
+                    letterSpacing: '-2px'
+                }}>
+                    FINAL STANDINGS
+                </h1>
+                <div style={{
+                    fontSize: '16px',
+                    color: 'rgba(255,255,255,0.5)',
+                    marginTop: '12px'
+                }}>
+                    {quizTitle || 'Live Quiz'} • {totalParticipants} Participants
+                </div>
+            </div>
+            
+            {/* Podium for Top 3 - Wider layout */}
+            <div style={{
+                display: 'flex',
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+                gap: 'clamp(16px, 3vw, 40px)',
+                marginBottom: '60px',
+                flexWrap: 'wrap',
+                zIndex: 10,
+                width: '100%',
+                maxWidth: '1100px',
+                padding: '0 20px'
+            }}>
+                {/* 2nd Place - Left */}
+                {top3[1] && <PodiumCard rank={2} user={top3[1]} score={top3[1].score} delay={0.3} totalParticipants={totalParticipants} />}
+                
+                {/* 1st Place - Center (tallest) */}
+                {top3[0] && <PodiumCard rank={1} user={top3[0]} score={top3[0].score} delay={0.1} totalParticipants={totalParticipants} />}
+                
+                {/* 3rd Place - Right */}
+                {top3[2] && <PodiumCard rank={3} user={top3[2]} score={top3[2].score} delay={0.5} totalParticipants={totalParticipants} />}
+            </div>
+            
+            {/* Rest of Leaderboard Table */}
+            {rest.length > 0 && (
+                <div style={{
+                    width: '100%',
+                    maxWidth: '800px',
+                    background: 'rgba(20, 20, 30, 0.8)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: '24px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    overflow: 'hidden',
+                    marginBottom: '40px',
+                    animation: 'fade-in 1s ease-out forwards',
+                    animationDelay: '0.8s',
+                    opacity: 0,
+                    zIndex: 10
+                }}>
+                    <div style={{
+                        padding: '20px 24px',
+                        borderBottom: '1px solid rgba(255,255,255,0.1)',
+                        background: 'rgba(255,255,255,0.02)'
+                    }}>
+                        <h3 style={{
+                            margin: 0,
+                            fontSize: '16px',
+                            fontWeight: 600,
+                            color: 'rgba(255,255,255,0.7)',
+                            textTransform: 'uppercase',
+                            letterSpacing: '2px'
+                        }}>
+                            Other Participants
+                        </h3>
+                    </div>
+                    <div style={{ maxHeight: '400px', overflow: 'auto' }}>
+                        <table style={{
+                            width: '100%',
+                            borderCollapse: 'collapse'
+                        }}>
+                            <thead>
+                                <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                    <th style={{
+                                        padding: '14px 20px',
+                                        textAlign: 'left',
+                                        fontSize: '12px',
+                                        fontWeight: 600,
+                                        color: 'rgba(255,255,255,0.4)',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '1px',
+                                        borderBottom: '1px solid rgba(255,255,255,0.05)'
+                                    }}>Rank</th>
+                                    <th style={{
+                                        padding: '14px 20px',
+                                        textAlign: 'left',
+                                        fontSize: '12px',
+                                        fontWeight: 600,
+                                        color: 'rgba(255,255,255,0.4)',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '1px',
+                                        borderBottom: '1px solid rgba(255,255,255,0.05)'
+                                    }}>Participant</th>
+                                    <th style={{
+                                        padding: '14px 20px',
+                                        textAlign: 'center',
+                                        fontSize: '12px',
+                                        fontWeight: 600,
+                                        color: 'rgba(255,255,255,0.4)',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '1px',
+                                        borderBottom: '1px solid rgba(255,255,255,0.05)'
+                                    }}>Correct</th>
+                                    <th style={{
+                                        padding: '14px 20px',
+                                        textAlign: 'right',
+                                        fontSize: '12px',
+                                        fontWeight: 600,
+                                        color: 'rgba(255,255,255,0.4)',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '1px',
+                                        borderBottom: '1px solid rgba(255,255,255,0.05)'
+                                    }}>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {rest.map((user, index) => (
+                                    <LeaderboardTableRow
+                                        key={user.oderId || index}
+                                        rank={index + 4}
+                                        user={user}
+                                        score={user.score}
+                                        delay={1 + (index * 0.05)}
+                                        isEven={index % 2 === 0}
+                                    />
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+            
+            {/* Return Button */}
+            <button
+                onClick={onReturn}
+                style={{
+                    padding: '16px 48px',
+                    fontSize: '16px',
+                    fontWeight: 700,
+                    color: 'white',
+                    background: 'linear-gradient(135deg, #4285F4 0%, #34A853 100%)',
+                    border: 'none',
+                    borderRadius: '100px',
+                    cursor: 'pointer',
+                    boxShadow: '0 10px 40px rgba(66, 133, 244, 0.3)',
+                    transition: 'all 0.3s ease',
+                    textTransform: 'uppercase',
+                    letterSpacing: '2px',
+                    animation: 'fade-in 1s ease-out forwards',
+                    animationDelay: '1.2s',
+                    opacity: 0,
+                    zIndex: 10
+                }}
+                onMouseOver={(e) => {
+                    e.target.style.transform = 'translateY(-3px) scale(1.02)';
+                    e.target.style.boxShadow = '0 15px 50px rgba(66, 133, 244, 0.4)';
+                }}
+                onMouseOut={(e) => {
+                    e.target.style.transform = 'translateY(0) scale(1)';
+                    e.target.style.boxShadow = '0 10px 40px rgba(66, 133, 244, 0.3)';
+                }}
+            >
+                Return to Dashboard
+            </button>
+        </div>
+    );
+};
+
+// Keep old PodiumAvatar for backwards compatibility (deprecated)
 const PodiumAvatar = ({ rank, user, score, delay }) => {
     const isFirst = rank === 1;
     const size = isFirst ? 110 : rank === 2 ? 90 : 80;
@@ -840,29 +1435,16 @@ const LiveQuizHostPage = () => {
         </div>
     );
 
-    // --- COMPLETION VIEW (PODIUM) ---
+    // --- COMPLETION VIEW (STUNNING FINAL LEADERBOARD) ---
     if (quizComplete) return (
         <div style={styles.container}>
             <GlobalStyles />
             <QuantumField active={true} />
-            <div style={{ ...styles.fullCenter, zIndex: 10, padding: '20px', overflow: 'auto' }}>
-                <GlassCard className="host-completion-card" style={{ width: '90%', maxWidth: '1000px', textAlign: 'center', padding: 'clamp(30px, 5vw, 60px)', border: '1px solid rgba(255,215,0,0.1)' }}>
-                    <div style={{ marginBottom: 'clamp(20px, 4vw, 40px)' }}>
-                        <GlitchText text="SESSION COMPLETE" style={{ fontSize: 'clamp(10px, 1.5vw, 14px)', letterSpacing: 'clamp(3px, 0.5vw, 6px)', color: THEME.colors.brand.yellow }} />
-                        <h1 className="text-gradient" style={{ fontSize: 'clamp(32px, 7vw, 72px)', margin: '16px 0', fontWeight: 800 }}>FINAL STANDINGS</h1>
-                    </div>
-
-                    <div className="host-podium-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end', gap: 'clamp(12px, 3vw, 32px)', height: 'clamp(250px, 40vw, 400px)', marginBottom: 'clamp(30px, 5vw, 60px)', flexWrap: 'wrap' }}>
-                        {leaderboard[1] && <PodiumAvatar rank={2} user={leaderboard[1]} score={leaderboard[1].score} delay={0.2} />}
-                        {leaderboard[0] && <PodiumAvatar rank={1} user={leaderboard[0]} score={leaderboard[0].score} delay={0} />}
-                        {leaderboard[2] && <PodiumAvatar rank={3} user={leaderboard[2]} score={leaderboard[2].score} delay={0.4} />}
-                    </div>
-
-                    <NeoButton className="host-btn" onClick={() => navigate('/admin/dashboard')} style={{ margin: '0 auto', width: 'clamp(180px, 30vw, 240px)' }}>
-                        Return to Dashboard
-                    </NeoButton>
-                </GlassCard>
-            </div>
+            <FinalLeaderboardScreen 
+                leaderboard={leaderboard}
+                onReturn={() => navigate('/admin/dashboard')}
+                quizTitle={quizInfo?.title}
+            />
         </div>
     );
 
